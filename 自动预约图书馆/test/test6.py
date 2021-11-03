@@ -19,6 +19,7 @@ print(segment)
 username = "201923020986"
 password = "fwj201923020986"
 code = "0000"  # 验证码
+# 预约列表
 seats = [122, 121, 62, 61, 65, 66]
 
 # url = "http://222.27.188.3/web/seat3?area=30&segment=1298506&day=2021-10-27&startTime=19:26&endTime=22:00"
