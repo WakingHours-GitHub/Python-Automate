@@ -20,7 +20,7 @@ username = "201923020986"
 password = "fwj201923020986"
 code = "0000"  # 验证码
 # 预约列表
-seats = [122, 121, 62, 61, 65, 66]
+seats = [122, 121, 62, 61, 65, 66, 6]
 
 # url = "http://222.27.188.3/web/seat3?area=30&segment=1298506&day=2021-10-27&startTime=19:26&endTime=22:00"
 Five_A = "http://222.27.188.3/web/seat3?area=30"
@@ -54,9 +54,18 @@ data = {
     "Server": "nginx-upupw/1.18.0-iocp",
     "Set-Cookie": "userid=201923020986; path=/",
     # "Set-Cookie": "user_name=%E8%8C%83%E7%8E%AE%E5%98%89; path=/",
-    # "Set-Cookie": "access_token=88b60d8214b427dd5bed50473830e196; path=/",
+    # "Set-Cookie   ": "access_token=88b60d8214b427dd5bed50473830e196; path=/",
     # "Set-Cookie": "expire=2021-10-28+14%3A58%3A02; path=/"
 }
+
+
+# 返回周围的状态, 是否满足预约条件, 传进来的是当前座位的参数
+def checkAround(ele):
+    txt = str(ele.get_attribute("outhrHTML"))
+    # 获取当前位置相对于4的信息
+    id = int(str(re.search(r"no&quot;:&quot;(?P<no>.*?)&quot;", txt).group("no"))) % 4
+
+    pass
 
 session = requests.session()
 
@@ -120,24 +129,29 @@ for seat in seats:
             # 使用正则表达式匹配状态: state
             state = re.search(r"&quot;status_name&quot;:&quot;(?P<state>.*?)&quot;", txt).group("state")
             # 比较返回的状态
-            if state == "空闲":
-                ele.click()  # 若是空闲, 则点击
-                # 点击完座位后, 确认预约
-                while True:
-                    try:
-                        # 点击确认预          约
-                        driver.find_element(By.CLASS_NAME,"ui-dialog-autofocus").click()
-                        # 预约成功
-                        print(f"{seat}号座位, 预约成功")
-                        success = 1 # 预约成功 # 预约到一个位置, 就算成功, 于是就不再预约下面的内容,直接退出
+            if state == "空闲": # 空闲状态
+                isYes = checkAround(ele)
+                if isYes: # 满足理想条件
+                    ele.click()  # 若是空闲, 则点击
+                    # 点击完座位后, 确认预约
+                    while True:
+                        try:
+                            # 点击确认预约
+                            driver.find_element(By.CLASS_NAME,"ui-dialog-autofocus").click()
+                            # 预约成功
+                            print(f"{seat}号座位, 预约成功")
+                            success = 1 # 预约成功 # 预约到一个位置, 就算成功, 于是就不再预约下面的内容,直接退出
 
-                        break
-                    except Exception:
-                        print("预约失败")
-                        success = 0
+                            break
+                        except Exception:
+                            print("预约失败")
+                            success = 0
+                else: # 不满足理想条件
+                    print(f"不满足理想条件, 于是放弃{seat}号座位")
+                    break
 
             # 其他状况
-            else:
+            else: # 非空闲状态
                 print(f"第{seat}号座位, 无法预约, 正在迭代下一次座位")
 
             break
@@ -152,3 +166,4 @@ for seat in seats:
 # time.sleep(100)  # 测试用
 
 driver.quit()  # 退出
+
