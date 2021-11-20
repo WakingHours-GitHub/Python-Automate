@@ -13,6 +13,7 @@ day_R = date.strftime("%d")
 
 # print(day, times)
 segment = 1298510  # 加密参数 # 应该模拟加密过程 # 模拟的参数, 正常加密过程没做完
+# 1298527
 segment = segment + int(day_R)
 print(segment)
 
