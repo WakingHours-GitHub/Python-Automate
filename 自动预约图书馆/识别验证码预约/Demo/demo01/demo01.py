@@ -1,11 +1,11 @@
 import sys
+import ddddocr
 import requests  # 用于进行访问
 import re  # re 模块, 用于正则匹配
 import time
 from selenium import webdriver  # 浏览器驱动
-from selenium.webdriver.common.by import By  # 元素定位对象
+from selenium.webdriver.common.by import By # 元素定位对象
 import datetime  # 日期, 时间相关
-import ddddocr  # 用于处理验证码
 import cv2
 import numpy as np
 
