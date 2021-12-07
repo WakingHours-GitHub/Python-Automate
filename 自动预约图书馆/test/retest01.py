@@ -24,3 +24,12 @@ print(re.search(r"no&quot;:&quot;(?P<no>.*?)&quot;", txt).group("no"))
 print(int(str(re.search(r"no&quot;:&quot;(?P<no>.*?)&quot;", txt).group("no"))) % 4)
 
 
+# 不用那么麻烦还要search().group()
+# 可选findall和finditer
+print(re.findall(r"&quot;status_name&quot;:     &quot;.*?&quot;", txt)) # 这样是拿到匹配的字符喘整体, 而是整体的匹配字符串
+print(re.findall(r"&quot;status_name&quot;:&quot;(.*?)&quot;", txt)) #这样加了括号才是拿到的分组之后的结果
+
+# 以上两行代码的实例:
+# ['&quot;status_name&quot;:&quot;使用中&quot;']
+# ['使用中']
+

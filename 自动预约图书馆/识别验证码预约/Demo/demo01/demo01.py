@@ -35,7 +35,7 @@ def getFive_A_URL():
     # 参数部分:
     segment = 1298510  # 具体还没有模拟
     # 用于确定日期天数
-    segment = segment + int(day_R) + 1  # 预约的是明天五楼A, 参数是仿的
+    segment = segment + int(day_R) + 1  # 预约的是明天五楼A, 参数是仿(模拟)的
 
     # print("segment -> ", segment)
     # 2021.11.18访问5楼室内
@@ -55,6 +55,7 @@ def getFive_A_URL():
 
 # 获取验证码部分:
 def getVerificationCode(driver):
+    # 定位截图：
     img = driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[2]/td/div/div/div[3]/img")
     img.screenshot("test2.png")
 
@@ -79,6 +80,7 @@ def getVerificationCode(driver):
 
     with open("test3.png", "rb") as f:
         imgBuff = f.read()
+
     ocr = ddddocr.DdddOcr()
     cood = ocr.classification(imgBuff)
     print(cood)
@@ -110,8 +112,6 @@ def getVerificationCode():
         
     return ocr.classification(resp.content)
     
-
-
 
     pass
 '''
