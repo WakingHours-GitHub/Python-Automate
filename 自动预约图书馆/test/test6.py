@@ -113,10 +113,10 @@ while 1:
 # 规律: ul -> li [x] .x 代表座位
 
 # 预约座位, 这里使用XPATH进行元素定位
-for seat in seats:
+for seats in seats:
     success = 0
      # 拼接XPATH
-    XPATH = "/html/body/div[6]/div[1]/div[1]/div/ul/li[" + str(seat) + "]"
+    XPATH = "/html/body/div[6]/div[1]/div[1]/div/ul/li[" + str(seats) + "]"
     XPATH.replace(" ", "")  # 清除空格 # 格式化
     print(XPATH) # 打印
 
@@ -140,7 +140,7 @@ for seat in seats:
                             # 点击确认预约
                             driver.find_element(By.CLASS_NAME,"ui-dialog-autofocus").click()
                             # 预约成功
-                            print(f"{seat}号座位, 预约成功")
+                            print(f"{seats}号座位, 预约成功")
                             success = 1 # 预约成功 # 预约到一个位置, 就算成功, 于是就不再预约下面的内容,直接退出
 
                             break
@@ -148,12 +148,12 @@ for seat in seats:
                             print("预约失败")
                             success = 0
                 else: # 不满足理想条件
-                    print(f"不满足理想条件, 于是放弃{seat}号座位")
+                    print(f"不满足理想条件, 于是放弃{seats}号座位")
                     break
 
             # 其他状况
             else: # 非空闲状态
-                print(f"第{seat}号座位, 无法预约, 正在迭代下一次座位")
+                print(f"第{seats}号座位, 无法预约, 正在迭代下一次座位")
 
             break
         except Exception:

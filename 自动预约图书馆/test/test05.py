@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 username = "201923020986"
 password = "fwj201923020986"
 
-seat = ["6146",]
+seats = ["6146", ]
 
 driver = webdriver.Edge()
 

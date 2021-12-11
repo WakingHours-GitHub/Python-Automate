@@ -1,16 +1,42 @@
 import sys
 import ddddocr
 import requests  # 用于进行访问
-import re  # re 模块, 用于正则匹配
+import re  # re 模块, 用于正则匹配, 匹配状态信息
 import time
 from selenium import webdriver  # 浏览器驱动
-from selenium.webdriver.common.by import By # 元素定位对象
+from selenium.webdriver.common.by import By  # 元素定位对象
 import datetime  # 日期, 时间相关
 import cv2
 import numpy as np
 
+seats = [66, 67, 122]
 
-# 获取5A的URL
+
+# 获取今日的5A的URL的值
+def getFive_A_URL_today():
+    date = datetime.datetime.now()  # 返回datetime对象
+    day = date.strftime("%Y-%m-%d")  # 获取年月日
+    times = date.strftime("%H:%M")  # 获取当前时间 # 也可以修改为自定义时间
+    day_R = date.strftime("%d")  # 获取当前 :日 (号)
+    print(day_R)
+    segment = 1298540  # 具体还没有模拟
+    segment = segment + int(day_R)  # 预约的是当前时间的
+
+    "http://222.27.188.3/web/seat3?area=30&segment=1298549&day=2021-12-9&startTime=21:38&endTime=22:00"
+    # http://222.27.188.3/web/seat3?area=30&segment=1298550&day=2021-12-10&startTime=07:18&endTime=22:00
+
+    # 拼接url:
+
+    Five_A_URL = "http://222.27.188.3/web/seat3?area=30&segment=" + str(segment) + "&day=" + str(
+        day) + "&startTime=" + str(times) + "&endTime=22:00"
+    Five_A_URL = Five_A_URL.replace(" ", "")
+
+    print("Five_A_URL -> ", Five_A_URL)
+
+    return Five_A_URL
+
+
+# 获取5A的URL 后一天的 (明天)
 # 未解决的问题: segment仍然是仿真值, 没有模拟过程
 def getFive_A_URL():
     """
@@ -24,10 +50,9 @@ def getFive_A_URL():
     day_R = date.strftime("%d")  # 获取当前 :日 (号)
 
     # 对日期做计算
-    delta = datetime.timedelta(days = 1)
+    delta = datetime.timedelta(days=1)
     dateOfReservation = date + delta  # 得到的是后一天的时间
     print(dateOfReservation.strftime("%Y-%m-%d"))  # 后一天
-
 
     # print(day_R)
     # print(day)
@@ -36,13 +61,10 @@ def getFive_A_URL():
     segment = 1298510  # 具体还没有模拟
     # 用于确定日期天数
     segment = segment + int(day_R) + 1  # 预约的是明天五楼A, 参数是仿(模拟)的
-
     # print("segment -> ", segment)
     # 2021.11.18访问5楼室内
     # "http://222.27.188.3/web/seat3?area=29&segment=1297994&day=2021-11-19&startTime=06:00&endTime=22:00"
-
     # 拼接url:
-
 
     Five_A_URL = "http://222.27.188.3/web/seat3?area=30&segment=" + str(segment) + "&day=" + str(
         dateOfReservation.strftime("%Y-%m-%d")) + "&startTime=06:00&endTime=22:00"
@@ -53,14 +75,38 @@ def getFive_A_URL():
     return Five_A_URL
 
 
+def picture_DealWith(img):
+    rows, cols = img.shape[:2]
+    img = cv2.resize(img, (10 * rows, 3 * cols), img)
+    return img
+
+
 # 获取验证码部分:
 def getVerificationCode(driver):
+    ocr = ddddocr.DdddOcr()
     # 定位截图：
     img = driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[2]/td/div/div/div[3]/img")
     img.screenshot("test2.png")
 
     cv2img = cv2.imread("test2.png")
     cv2img = cv2.cvtColor(cv2img, cv2.COLOR_RGB2GRAY)
+
+    cv2img = picture_DealWith(cv2img)
+    cv2.imwrite("ocr.png", cv2img)
+    with open("ocr.png", "rb") as f:
+        ocrImg = f.read()
+        cood = ocr.classification(ocrImg)
+    cood = str(cood)
+    print(f"origin:{cood}")
+
+    if 'o' in cood:  # r
+        print("O")
+        cood.replace('o', '0').replace('O', '0').replace('z', '2').replace('Z', '2').replace('>','7').replace('。', '0')
+    print(f"fix: {cood}")
+
+    return cood
+
+    """
     # ret, binary = cv2.threshold(cv2img, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
     # 中位值降噪
     # dst = cv2.medianBlur(cv2img, 5)
@@ -85,6 +131,7 @@ def getVerificationCode(driver):
     cood = ocr.classification(imgBuff)
     print(cood)
     return cood
+    """
 
 
 # 下面代码是一开始的想法, 但是是不可行的
@@ -107,7 +154,7 @@ def getVerificationCode():
 
     with open("test.png", "wb") as f:
         f.write(resp.content)
-    ocr = ddddocr.DdddOcr()  # -> 实例化对象
+    ocr = ddddocr.DdddOcr()  # -> 实例化对象0
     print(ocr.classification(resp.content))
         
     return ocr.classification(resp.content)
@@ -127,7 +174,8 @@ def login(user, driver):
                 user["username"])
             driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[2]/td/div/div/div[2]/input").send_keys(
                 user["password"])
-            time.sleep(2)
+
+            # time.sleep(2)
 
             driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[2]/td/div/div/div[3]/input").send_keys(
                 str(getVerificationCode(driver)))
@@ -135,7 +183,7 @@ def login(user, driver):
         except:
             print("登录界面找到")
 
-    time.sleep(5)
+    time.sleep(1)
 
     # 点击登录, -> 需要判断是否登录成功
     while True:
@@ -161,21 +209,57 @@ def login(user, driver):
             pass
 
 
+def chooseSeat(driver):
+    global seats
+
+    isSucceed = 0
+    # "/html/body/div[6]/div[1]/div[1]/div/ul/li[66]" -> 代表的是66号座位
+    for seat in seats:
+
+        xpath = "/html/body/div[6]/div[1]/div[1]/div/ul/li[" + str(seat) + "]"
+        while True:
+            try:
+                seat_obj = driver.find_element(By.XPATH, xpath)
+                information = seat_obj.get_attribute("outerHTML")  # 得到信息
+                # print(information)
+                # 利用正则匹配
+                state = re.findall("status_name&quot;:&quot;(.*?)&quot;", information)[0]
+                # print(state)
+                if state == "空闲":
+                    seat_obj.click()  # click
+                    isSucceed = 1
+                else:
+                    isSucceed = 0
+
+                break
+
+            except:
+                print("seat is mistake")
+        if isSucceed == 1:
+            break
+
+    return isSucceed
+
 
 def run():
     # 创建用户字典
     # 当前是一个用户, 后面可做成多线程, 或者迭代的版本
+    # users = {
+    #     "name": "FWJ",
+    #     "username": "201923020986",
+    #     "password": "fwj201923020986"
+    # }
     users = {
-        "name": "FWJ",
-        "username": "201923020986",
-        "password": "fwj201923020986"
+        "name": "LZA",
+        "username": "201923021220",
+        "password": "lza201923021220"
     }
 
     # 启动浏览器,进行预约
     driver = webdriver.Edge()  # 启动浏览器
 
-    driver.get(getFive_A_URL())  # 访问五楼A
-
+    # driver.get(getFive_A_URL())  # 访问五楼A
+    driver.get(getFive_A_URL_today())
     while True:
         try:
             # 点击登录界面
@@ -200,14 +284,29 @@ def run():
     # 下面进行登录操作 -> sentKey(输入)和破解验证码
     login(users, driver)
 
-
-
     # 登陆完, 要进行座位判断和获取
     """
         两种版本
         -> 可以做全盘扫描, 哪里有地方, 选哪  -> 需要全局扫描
         -> 指定座位列表, 按照优先级, 选择座位 -> 指定座位列表, 针对作为列表去选座
     """
+    if chooseSeat(driver):
+        print("suceed")
+        # click ok
+        # flod: /html/body/div[11]/div/table/tbody/tr[3]/td/div[2]/button[2]
+        # unflod: /html/body/div[11]/div/table/tbody/tr[3]/td/div[2]/button[2]
+        "/html/body/div[11]/div/table/tbody/tr[3]/td/div[2]/button[2]"
+        "/html/body/div[11]/div/table/tbody/tr[3]/td/div[2]/button[2]"
+        while True:
+            try:
+                driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[3]/td/div[2]/button[2]").click()
+                break
+            except:
+                print("error")
+
+
+    else:
+        print("not")
 
     time.sleep(1000)  # 暂停
 
