@@ -244,16 +244,16 @@ def chooseSeat(driver):
 def run():
     # 创建用户字典
     # 当前是一个用户, 后面可做成多线程, 或者迭代的版本
-    # users = {
-    #     "name": "FWJ",
-    #     "username": "201923020986",
-    #     "password": "fwj201923020986"
-    # }
     users = {
-        "name": "LZA",
-        "username": "201923021220",
-        "password": "lza201923021220"
+        "name": "FWJ",
+        "username": "201923020986",
+        "password": "fwj201923020986"
     }
+    # users = {
+    #     "name": "LZA",
+    #     "username": "201923021220",
+    #     "password": "lza201923021220"
+    # }
 
     # 启动浏览器,进行预约
     driver = webdriver.Edge()  # 启动浏览器
