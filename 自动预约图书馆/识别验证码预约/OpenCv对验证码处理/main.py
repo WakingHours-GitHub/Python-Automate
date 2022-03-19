@@ -24,7 +24,7 @@ print(ocr.classification(buff))
 cv2.waitKey(0)
 
 """
-img = cv2.imread("test2.png", cv2.IMREAD_GRAYSCALE)
+img = cv2.imread("soucre.png", cv2.IMREAD_GRAYSCALE)
 a = 1
 # 线性变换  定义float类型·
 O = float(a) * img

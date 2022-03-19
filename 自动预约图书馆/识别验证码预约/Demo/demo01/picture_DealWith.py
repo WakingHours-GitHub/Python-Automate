@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import ddddocr
 
 """
-test2 = cv2.imread("test2.png")
+test2 = cv2.imread("soucre.png")
 
 pra = 0.9
 height, width = test2.shape[:2]
@@ -26,7 +26,7 @@ with open("test4.png", "rb") as f:
     img = f.read()
 
     print("处理后的识别 -> ",ocr.classification(img))
-with open("test2.png", "rb") as f:
+with open("soucre.png", "rb") as f:
     img = f.read()
     print("处理前的识别 -> ", ocr.classification(img))
 

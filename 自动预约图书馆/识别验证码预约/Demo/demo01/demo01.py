@@ -86,7 +86,7 @@ def getVerificationCode(driver):
     ocr = ddddocr.DdddOcr()
     # 定位截图：
     img = driver.find_element(By.XPATH, "/html/body/div[11]/div/table/tbody/tr[2]/td/div/div/div[3]/img")
-    img.screenshot("test2.png")
+    img.screenshot("soucre.png")
 
     cv2img = cv2.imread("test2.png")
     cv2img = cv2.cvtColor(cv2img, cv2.COLOR_RGB2GRAY)
